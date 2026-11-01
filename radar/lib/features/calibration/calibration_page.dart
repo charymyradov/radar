@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../core/camera/preview_geometry.dart';
 import '../../core/providers.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/geometry/geometry.dart';
@@ -223,7 +224,7 @@ class _CalibrationPageState extends ConsumerState<CalibrationPage> {
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: AspectRatio(
-              aspectRatio: camera?.value.aspectRatio ?? 0.72,
+              aspectRatio: uprightPreviewAspectRatio(camera),
               child: Stack(
                 fit: StackFit.expand,
                 children: [

@@ -37,6 +37,21 @@ void main() {
         kFallbackPortraitAspectRatio,
       );
     });
+
+    test('ignores invalid preview dimensions and aspect ratios', () {
+      expect(
+        uprightAspectRatio(
+          previewSize: const Size(0, 720),
+          aspectRatio: 16 / 9,
+        ),
+        closeTo(9 / 16, 1e-9),
+      );
+      expect(
+        uprightAspectRatio(aspectRatio: double.infinity),
+        kFallbackPortraitAspectRatio,
+      );
+      expect(uprightAspectRatio(aspectRatio: -1), kFallbackPortraitAspectRatio);
+    });
   });
 
   test('uprightPreviewAspectRatio falls back without a camera', () {

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -39,10 +37,12 @@ class AppShell extends ConsumerWidget {
       body: child,
       bottomNavigationBar: NavigationBar(
         selectedIndex: selected,
-        onDestinationSelected: (index) {
+        onDestinationSelected: (index) async {
           if (index != 0) {
-            unawaited(ref.read(liveSessionProvider.notifier).stop());
+            // Await the release so the next page can claim the camera.
+            await ref.read(liveSessionProvider.notifier).stop();
           }
+          if (!context.mounted) return;
           context.go(destinations[index].$3);
         },
         destinations: [

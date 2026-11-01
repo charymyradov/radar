@@ -55,6 +55,17 @@ class _LivePageState extends ConsumerState<LivePage>
     super.dispose();
   }
 
+  /// Releases the camera before the calibration page opens its own preview.
+  ///
+  /// The camera belongs to the live session provider, so leaving the page via
+  /// the router alone would keep the sensor busy and the calibration editor
+  /// could not initialize.
+  Future<void> _goToCalibration() async {
+    await ref.read(liveSessionProvider.notifier).stop();
+    if (!mounted) return;
+    context.go('/calibration');
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -88,7 +99,7 @@ class _LivePageState extends ConsumerState<LivePage>
             _LiveError(
               message: _localizedError(context, state.error!),
               onCalibration: state.error == 'CALIBRATION_REQUIRED'
-                  ? () => context.go('/calibration')
+                  ? _goToCalibration
                   : null,
               onSettings: state.error == 'CAMERA_PERMISSION_DENIED'
                   ? openAppSettings

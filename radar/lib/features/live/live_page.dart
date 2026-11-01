@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../core/camera/preview_geometry.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/providers.dart';
 import '../../domain/geometry/geometry.dart';
@@ -114,7 +115,7 @@ class _LivePageState extends ConsumerState<LivePage>
               borderRadius: BorderRadius.circular(18),
             ),
             child: AspectRatio(
-              aspectRatio: 0.62,
+              aspectRatio: uprightPreviewAspectRatio(camera),
               child: Stack(
                 fit: StackFit.expand,
                 children: [

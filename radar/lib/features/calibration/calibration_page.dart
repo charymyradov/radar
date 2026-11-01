@@ -25,6 +25,7 @@ class _CalibrationPageState extends ConsumerState<CalibrationPage> {
   String? _cameraError;
   bool _cameraLoading = true;
   bool _saving = false;
+  bool _edited = false;
   int? _draggedHandle;
   final _distanceController = TextEditingController(text: '10');
   LineSegment _lineA = const LineSegment(
@@ -40,7 +41,32 @@ class _CalibrationPageState extends ConsumerState<CalibrationPage> {
   void initState() {
     super.initState();
     unawaited(_openCamera());
+    unawaited(_loadActiveCalibration());
   }
+
+  /// Starts the editor from the calibration that is currently in use, so users
+  /// refine the existing lines instead of drawing new ones from scratch.
+  Future<void> _loadActiveCalibration() async {
+    try {
+      final active = await ref
+          .read(calibrationRepositoryProvider)
+          .active(kDefaultStationId);
+      if (!mounted || active == null || _edited) return;
+      setState(() {
+        _lineA = active.geometry.lineA;
+        _lineB = active.geometry.lineB;
+        _distanceController.text = _formatDistance(
+          active.geometry.distanceMeters,
+        );
+      });
+    } catch (error) {
+      ref.read(appErrorProvider.notifier).report(error);
+    }
+  }
+
+  String _formatDistance(double metres) => metres == metres.roundToDouble()
+      ? metres.toStringAsFixed(0)
+      : metres.toStringAsFixed(1);
 
   @override
   void dispose() {
@@ -167,6 +193,7 @@ class _CalibrationPageState extends ConsumerState<CalibrationPage> {
   void _moveHandle(NormPoint point) {
     final handle = _draggedHandle;
     if (handle == null) return;
+    _edited = true;
     setState(() {
       switch (handle) {
         case 0:
@@ -266,7 +293,7 @@ class _CalibrationPageState extends ConsumerState<CalibrationPage> {
               hintText: l10n.calibrationDistanceHint,
               suffixText: 'm',
             ),
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => setState(() => _edited = true),
           ),
           const SizedBox(height: 12),
           _LineLegend(color: AppTheme.accent, label: l10n.calibrationLineA),

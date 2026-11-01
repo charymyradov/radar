@@ -40,4 +40,6 @@ Android release APK'sı `flutter build apk --release` ile
 - Uygulama tek bir varsayılan istasyon kullanır; hesap veya sunucu yoktur.
 - Hızlar veritabanında km/h olarak tutulur; gösterim birimi ayarlardan gelir.
 - Kalibrasyon koordinatları, döndürülmüş kamera görüntüsüne göre normalize edilir.
+- Kamera ve kalibrasyon ekranları, algılama koordinatlarıyla hizayı korumak için
+  portre yönelimine kilitlenir.
 - Yalnızca hız ihlallerinde görsel saklanır; olağan tespitlerde görsel tutulmaz.

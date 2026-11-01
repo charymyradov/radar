@@ -1,0 +1,21 @@
+{
+  "_comment": "Detection model + COCO class mapping. Edit to swap models without touching code.",
+  "model": {
+    "asset": "assets/models/yolov8n.tflite",
+    "inputSize": 640,
+    "layout": "auto",
+    "scoreThreshold": 0.35,
+    "iouThreshold": 0.45,
+    "maxDetections": 30,
+    "numThreads": 4
+  },
+  "labels": {
+    "asset": "assets/config/coco_labels.txt"
+  },
+  "vehicleClasses": {
+    "2": "car",
+    "3": "motorcycle",
+    "5": "bus",
+    "7": "truck"
+  }
+}

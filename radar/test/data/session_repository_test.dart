@@ -54,6 +54,48 @@ void main() {
     expect(sessions.single.violationCount, 1);
   });
 
+  test('running() and byId() include violations', () async {
+    final now = DateTime.utc(2026, 1, 1);
+    await db
+        .into(db.sessions)
+        .insert(
+          SessionsCompanion.insert(
+            id: 'ses-running',
+            stationId: 'default',
+            startedAt: now,
+          ),
+        );
+    await db
+        .into(db.events)
+        .insert(
+          EventsCompanion.insert(
+            id: 'evt-running',
+            sessionId: 'ses-running',
+            countedAt: now,
+            vehicleClass: VehicleClass.car,
+            direction: TravelDirection.inbound,
+            speedKmh: const Value(90.0),
+            confidence: 0.9,
+          ),
+        );
+    await db
+        .into(db.violations)
+        .insert(
+          ViolationsCompanion.insert(
+            id: 'vio-running',
+            eventId: 'evt-running',
+            limitKmh: 50,
+            status: ViolationStatus.pending,
+            createdAt: now,
+          ),
+        );
+
+    final repository = SessionRepository(db);
+
+    expect((await repository.running())?.violationCount, 1);
+    expect((await repository.byId('ses-running'))?.violationCount, 1);
+  });
+
   test('list() keeps sessions that have no events', () async {
     await db.into(db.sessions).insert(
           SessionsCompanion.insert(

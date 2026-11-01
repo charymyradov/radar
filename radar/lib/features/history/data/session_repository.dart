@@ -126,6 +126,10 @@ class SessionRepository {
   Future<void> delete(String id) => _db.deleteSessionCascade(id);
 
   Future<Map<String, int>> _violationCounts() async {
+    // The join excludes the events columns, so the session id has to be added
+    // explicitly; `readTable` would throw for a table that is not selected.
+    final sessionId = _db.events.sessionId;
+    final count = _db.violations.id.count();
     final query = _db.select(_db.violations).join([
       innerJoin(
         _db.events,
@@ -133,12 +137,15 @@ class SessionRepository {
         useColumns: false,
       ),
     ])
-      ..addColumns([_db.violations.id.count()])
-      ..groupBy([_db.events.sessionId]);
+      ..addColumns([sessionId, count])
+      ..groupBy([sessionId]);
     final rows = await query.get();
-    return {
-      for (final row in rows)
-        row.readTable(_db.events).sessionId: row.read(_db.violations.id.count()) ?? 0,
-    };
+    final counts = <String, int>{};
+    for (final row in rows) {
+      final id = row.read(sessionId);
+      if (id == null) continue;
+      counts[id] = row.read(count) ?? 0;
+    }
+    return counts;
   }
 }
